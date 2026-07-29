@@ -1,0 +1,113 @@
+# Ticket Triage System — Configuration
+# Edit this file to tune the system without touching code.
+
+# ------------------------------------------------------------------
+# DATA SETTINGS
+# ------------------------------------------------------------------
+data:
+  # Path to your training data. Supported: .csv, .json, .xlsx
+  # CSV must have columns: subject, body, category
+  train_path: "data/tickets.csv"
+
+  # Column names (change if your file uses different headers)
+  subject_col: "Ticket Subject"      # Maps to your subject
+  body_col: "Ticket Description"     # Maps to your body/description
+  label_col: "Ticket Type"           # Maps to your category
+
+  # Text separator between subject and body
+  text_separator: " "
+
+# ------------------------------------------------------------------
+# TEXT PREPROCESSING
+# ------------------------------------------------------------------
+preprocessing:
+  lowercase: true
+  remove_urls: true
+  remove_emails: true
+  remove_phone_numbers: true
+  remove_numbers: true
+  remove_punctuation: true
+  min_token_length: 3
+
+  # Stopwords: 'builtin' uses our curated list, or provide a file path
+  stopwords_source: "builtin"
+
+  # Stemming: 'simple' (fast, no deps), 'porter' (needs nltk), or 'none'
+  stemmer: "simple"
+
+# ------------------------------------------------------------------
+# FEATURE ENGINEERING (TF-IDF)
+# ------------------------------------------------------------------
+features:
+  max_features: 500
+  ngram_range: [1, 2]        # [min, max]
+  min_df: 2
+  max_df: 0.85
+  sublinear_tf: true
+
+# ------------------------------------------------------------------
+# MODEL SETTINGS
+# ------------------------------------------------------------------
+model:
+  # 'logistic_regression' or 'naive_bayes'
+  type: "logistic_regression"
+
+  # Logistic Regression params
+  lr_c: 1.0
+  lr_max_iter: 1000
+
+  # Naive Bayes params
+  nb_alpha: 0.1
+
+  # Train/test split
+  test_size: 0.25
+  random_state: 42
+
+# ------------------------------------------------------------------
+# TRIAGE & ROUTING
+# ------------------------------------------------------------------
+triage:
+  # Confidence threshold for auto-assignment
+  # Below this → routed to human review queue
+  confidence_threshold: 0.60
+
+  # Priority detection keywords
+  urgent_keywords:
+    - "urgent"
+    - "asap"
+    - "immediately"
+    - "critical"
+    - "down"
+    - "outage"
+    - "broken"
+    - "not working"
+    - "failed"
+    - "failure"
+    - "emergency"
+    - "escalate"
+    - "block"
+    - "stop"
+    - "crash"
+    - "error"
+    - "cannot access"
+    - "locked out"
+    - "deadline"
+    - "expire"
+    - "overdue"
+    - "complaint"
+    - "harassment"
+    - "lawsuit"
+    - "legal"
+
+  # Minimum keyword hits to flag as URGENT
+  urgent_threshold: 2
+
+# ------------------------------------------------------------------
+# OUTPUT PATHS
+# ------------------------------------------------------------------
+output:
+  model_dir: "models/"
+  vectorizer_file: "models/vectorizer.pkl"
+  model_file: "models/classifier.pkl"
+  label_encoder_file: "models/label_encoder.pkl"
+  reports_dir: "reports/"
